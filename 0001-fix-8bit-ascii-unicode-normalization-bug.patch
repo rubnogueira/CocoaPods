@@ -1,0 +1,47 @@
+From 268b7f3a11f9012043e836e53500e278cb43c815 Mon Sep 17 00:00:00 2001
+From: Ruben Nogueira <ruben@pruvo.com>
+Date: Thu, 25 May 2023 17:19:49 +0100
+Subject: [PATCH] fix: 8bit ascii unicode normalization bug
+
+---
+ lib/cocoapods/config.rb            | 6 +++++-
+ lib/cocoapods/sandbox/path_list.rb | 6 +++++-
+ 2 files changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/lib/cocoapods/config.rb b/lib/cocoapods/config.rb
+index 07e9414d3..f8ec01ca2 100644
+--- a/lib/cocoapods/config.rb
++++ b/lib/cocoapods/config.rb
+@@ -163,7 +163,11 @@ module Pod
+     #
+     def installation_root
+       @installation_root ||= begin
+-        current_dir = Pathname.new(Dir.pwd.unicode_normalize(:nfkc))
++        begin
++          current_dir = Pathname.new(Dir.pwd.unicode_normalize(:nfkc))
++        rescue Encoding::CompatibilityError
++          current_dir = Pathname.new(ActiveSupport::Multibyte::Unicode.normalize(Dir.pwd))
++        end
+         current_path = current_dir
+         until current_path.root?
+           if podfile_path_in_dir(current_path)
+diff --git a/lib/cocoapods/sandbox/path_list.rb b/lib/cocoapods/sandbox/path_list.rb
+index 7d85a01a5..e28623e89 100644
+--- a/lib/cocoapods/sandbox/path_list.rb
++++ b/lib/cocoapods/sandbox/path_list.rb
+@@ -23,7 +23,11 @@ module Pod
+       # @param  [Pathname] root @see #root
+       #
+       def initialize(root)
+-        root_dir = root.to_s.unicode_normalize(:nfkc)
++        begin
++          root_dir = root.to_s.unicode_normalize(:nfkc)
++        rescue Encoding::CompatibilityError
++          root_dir = ActiveSupport::Multibyte::Unicode.normalize(root.to_s)
++        end
+         @root = Pathname.new(root_dir)
+         @glob_cache = {}
+       end
+-- 
+2.39.2 (Apple Git-143)
+

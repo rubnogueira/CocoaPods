@@ -20,7 +20,7 @@ gemspec
 
 group :development do
   cp_gem 'claide',                'CLAide'
-  cp_gem 'cocoapods-core',        'Core'
+  #cp_gem 'cocoapods-core',        'Core'
   cp_gem 'cocoapods-deintegrate', 'cocoapods-deintegrate'
   cp_gem 'cocoapods-downloader',  'cocoapods-downloader'
   cp_gem 'cocoapods-plugins',     'cocoapods-plugins'
@@ -31,10 +31,12 @@ group :development do
   cp_gem 'nanaimo',               'Nanaimo'
   cp_gem 'xcodeproj',             'Xcodeproj'
 
+  gem 'cocoapods-core', :git => 'https://github.com/rubnogueira/Core', :branch => '1.12.1-active6.0'
+
   gem 'cocoapods-dependencies', '~> 1.0.beta.1'
 
   # Pin activesupport to < 7 because we still test with Ruby 2.6 in CI.
-  gem 'activesupport', '> 5', '< 7'
+  gem 'activesupport', '> 5', '~> 6.0.0'
   gem 'bacon', :git => 'https://github.com/leahneukirchen/bacon.git'
   gem 'mocha', '< 1.5'
   gem 'mocha-on-bacon'

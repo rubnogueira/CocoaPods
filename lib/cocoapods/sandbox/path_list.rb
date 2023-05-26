@@ -23,7 +23,11 @@ module Pod
       # @param  [Pathname] root @see #root
       #
       def initialize(root)
-        root_dir = root.to_s.unicode_normalize(:nfkc)
+        begin
+          root_dir = root.to_s.unicode_normalize(:nfkc)
+        rescue Encoding::CompatibilityError
+          root_dir = ActiveSupport::Multibyte::Unicode.normalize(root.to_s)
+        end
         @root = Pathname.new(root_dir)
         @glob_cache = {}
       end
