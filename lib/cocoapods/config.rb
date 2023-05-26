@@ -163,7 +163,11 @@ module Pod
     #
     def installation_root
       @installation_root ||= begin
-        current_dir = Pathname.new(Dir.pwd.unicode_normalize(:nfkc))
+        begin
+          current_dir = Pathname.new(Dir.pwd.unicode_normalize(:nfkc))
+        rescue Encoding::CompatibilityError
+          current_dir = Pathname.new(ActiveSupport::Multibyte::Unicode.normalize(Dir.pwd))
+        end
         current_path = current_dir
         until current_path.root?
           if podfile_path_in_dir(current_path)
